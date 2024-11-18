@@ -69,7 +69,14 @@
             }
         }
 
-        // Function to send a message along with the user's IP to the webhook
+        // Function to detect browser and timezone
+        function getBrowserAndTimezone() {
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const browser = navigator.userAgent;
+            return { timezone, browser };
+        }
+
+        // Function to send a message along with user details to the webhook
         async function sendMessage() {
             const messageBox = document.getElementById('message');
             const status = document.getElementById('status');
@@ -85,6 +92,7 @@
             status.style.color = "#ffffff";
 
             const ip = await getIPAddress();
+            const { timezone, browser } = getBrowserAndTimezone();
 
             status.textContent = "Sending...";
             try {
@@ -92,12 +100,12 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        content: `Message: ${message}\nIP: ${ip}`
+                        content: `Message: ${message}\nIP: ${ip}\nTimezone: ${timezone}\nBrowser: ${browser}`
                     }),
                 });
 
                 if (response.ok) {
-                    status.textContent = "Message and IP sent successfully!";
+                    status.textContent = "Message and details sent successfully!";
                     status.style.color = "green";
                     messageBox.value = ""; // Clear the textbox
                 } else {
